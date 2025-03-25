@@ -55,6 +55,10 @@ class Config
                     'access_key' => $smsConfig['engine']['qiniu']['AccessKey'],
                     'secret_key' => $smsConfig['engine']['qiniu']['SecretKey'],
                 ],
+                'fsidc' => [
+                    'secretId' => $smsConfig['engine']['fsidc']['secretId'],
+                    'secretKey' => $smsConfig['engine']['fsidc']['secretKey'],
+                ],
             ]
         ];
     }

@@ -19,6 +19,9 @@ use Overtrue\EasySms\EasySms;
 use Overtrue\EasySms\Exceptions\InvalidArgumentException;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 
+use Overtrue\EasySms\Message;
+use Overtrue\EasySms\Exceptions\GatewayErrorException;
+use GuzzleHttp\Client;
 /**
  * 短信通知模块驱动
  * Class Driver
@@ -61,6 +64,9 @@ class Driver
         // 实例化EasySms
         $easySmsConfig = Config::getEasySmsConfig($this->smsConfig);
         $easySms = new EasySms($easySmsConfig);
+        $easySms->extend('fsidc', function($gatewayConfig){
+            return new FSGateway($gatewayConfig);
+        });
         try {
             // 执行发送短信
             $result = $easySms->send($acceptPhone, [
@@ -145,5 +151,71 @@ class Driver
             $templateParams = array_values($templateParams);
         }
         return $templateParams;
+    }
+}
+
+use Overtrue\EasySms\Traits\HasHttpRequest;
+use Overtrue\EasySms\Contracts\MessageInterface;
+use Overtrue\EasySms\Contracts\PhoneNumberInterface;
+
+class FSGateway
+{
+    use HasHttpRequest;
+
+    public const ENDPOINT_URL = 'https://service-1o4d82wx-1300755093.bj.apigw.tencentcs.com/release/sms/send';
+    public const SIGNATURE_ALGORITHM = 'hmacSHA1';
+    public const SUCCESS_CODE = '000000';
+
+    private $config;
+
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+    }
+
+    public function getName()
+    {
+        return 'fsidc';
+    }
+    
+    public function send(PhoneNumberInterface $phone, MessageInterface $message, array $params = [])
+    {
+        $response = $this->post(self::ENDPOINT_URL, [
+            'headers' => $this->buildHeaders(),
+            'form_params' => $this->buildBodyParams($phone, $message),
+        ]);
+
+        if (self::SUCCESS_CODE !== $response['Code']) {
+            throw new GatewayErrorException(
+                $response['Message'] ?? 'Unknown error',
+                $response['Code'],
+                ['gateway' => get_class($this), 'config' => $this->config]
+            );
+        }
+
+        return $response;
+    }
+
+    private function buildHeaders(): array
+    {
+        $datetime = gmdate('D, d M Y H:i:s T');
+        $signStr = "x-date: {$datetime}\nx-source: market";
+        $sign = base64_encode(hash_hmac('sha1', $signStr, $this->config['secretKey'], true));
+        $auth = sprintf('hmac id="%s", algorithm="%s", headers="x-date x-source", signature="%s"', 
+            $this->config['secretId'], self::SIGNATURE_ALGORITHM, $sign);
+
+        return [
+            'X-Source' => 'market',
+            'X-Date' => $datetime,
+            'Authorization' => $auth,
+        ];
+    }
+
+    private function buildBodyParams(PhoneNumberInterface $phone, MessageInterface $message): array
+    {
+        return [
+            'content' => $message->getContent(),
+            'mobile' => $phone->getUniversalNumber(),
+        ];
     }
 }

@@ -201,7 +201,7 @@ class Goods extends GoodsModel
         // 默认数据
         $data = array_merge($data, [
             'line_price' => $data['line_price'] ?? 0,
-            'content' => $data['content'] ?? '',
+            'content' => !empty($data['content']) ? json_encode($data['content']) : '',
             'newSpecList' => [],
             'newSkuList' => [],
             'store_id' => self::$storeId,

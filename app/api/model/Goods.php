@@ -12,6 +12,7 @@ declare (strict_types=1);
 
 namespace app\api\model;
 
+use app\common\library\helper;
 use app\api\service\Goods as GoodsService;
 use app\api\service\user\Grade as UserGradeService;
 use app\api\model\GoodsSku as GoodsSkuModel;
@@ -55,9 +56,9 @@ class Goods extends GoodsModel
      * @param $value
      * @return string
      */
-    public function getContentAttr($value): string
+    public function getContentAttr($value): array
     {
-        return \htmlspecialchars_decode((string)$value);
+        return helper::jsonDecode(htmlspecialchars_decode($value));
     }
 
     /**

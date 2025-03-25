@@ -225,6 +225,14 @@ class Setting extends BaseModel
                             'AccessKey' => '',
                             'SecretKey' => '',
                         ],
+                        // 浮生
+                        'fsidc' => [
+                            'name' => '浮生短信',
+                            'website' => 'https://www.fsidc.com',
+                            'secretId' => '',
+                            'secretKey' => '',
+                            'sign' => '浮生互联'
+                        ],
                     ],
                     // 短信通知场景
                     'scene' => [
@@ -238,6 +246,7 @@ class Setting extends BaseModel
                                 'aliyun' => ['${code}'],
                                 'qiniu' => ['${code}'],
                                 'qcloud' => ['{1}'],
+                                'fsidc' => ['#code#']
                             ]
                         ],
                         // 新付款订单
@@ -251,6 +260,7 @@ class Setting extends BaseModel
                                 'aliyun' => ['${order_no}'],
                                 'qiniu' => ['${order_no}'],
                                 'qcloud' => ['{1}'],
+                                'fsidc' => ['#code#']
                             ]
                         ],
                     ]

@@ -68,16 +68,25 @@ class Goods extends BaseModel
         return $data['sales_initial'] + $data['sales_actual'];
     }
 
+    // /**
+    //  * 商品详情：HTML实体转换回普通字符
+    //  * @param $value
+    //  * @return string
+    //  */
+    // public function getContentAttr($value): string
+    // {
+    //     return htmlspecialchars_decode($value);
+    // }
+    
     /**
-     * 商品详情：HTML实体转换回普通字符
+     * 获取器：商品内容
      * @param $value
-     * @return string
+     * @return mixed
      */
-    public function getContentAttr($value): string
+    public function getContentAttr($value)
     {
-        return htmlspecialchars_decode($value);
+        return helper::jsonDecode(htmlspecialchars_decode($value))?: [];
     }
-
     /**
      * 获取器：单独设置折扣的配置
      * @param $json
