@@ -54,11 +54,18 @@ class Goods extends GoodsModel
     /**
      * 商品详情：HTML实体转换回普通字符
      * @param $value
-     * @return string
+     * @return array
      */
     public function getContentAttr($value): array
     {
-        return helper::jsonDecode(htmlspecialchars_decode($value));
+        $decoded = json_decode($value, true);
+        if (!$decoded) {
+            return [];
+        }
+        array_walk_recursive($decoded, function(&$item) {
+            $item = htmlspecialchars_decode($item);
+        });
+        return $decoded;
     }
 
     /**

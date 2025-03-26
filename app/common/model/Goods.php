@@ -83,9 +83,16 @@ class Goods extends BaseModel
      * @param $value
      * @return mixed
      */
-    public function getContentAttr($value)
+    public function getContentAttr($value): array
     {
-        return helper::jsonDecode(htmlspecialchars_decode($value))?: [];
+        $decoded = json_decode($value, true);
+        if (!$decoded) {
+            return [];
+        }
+        array_walk_recursive($decoded, function(&$item) {
+            $item = htmlspecialchars_decode($item);
+        });
+        return $decoded;
     }
     /**
      * 获取器：单独设置折扣的配置
