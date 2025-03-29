@@ -65,6 +65,7 @@ class GoodsSpecRel extends BaseModel
         foreach ($data as $groupKey => $item) {
             $groupData[$item['spec_id']] = [
                 'spec_id' => $item['spec']['spec_id'],
+                'spec_type' => $item['spec']['spec_type'],
                 'spec_name' => $item['spec']['spec_name']
             ];
         }

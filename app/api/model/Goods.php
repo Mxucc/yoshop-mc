@@ -281,11 +281,13 @@ class Goods extends GoodsModel
         if ($goods->getRelation('skuList')) {
             foreach ($goods['skuList'] as &$skuItem) {
                 $skuItem['goods_price'] = UserGradeService::getDiscountPrice($skuItem['goods_price'], $discountRatio);
+                $skuItem['holiday_price'] = UserGradeService::getDiscountPrice($skuItem['holiday_price'], $discountRatio);
             }
         }
         // 会员折扣价: 已选择的商品sku（用于购物车）
         if ($goods->getAttr('skuInfo')) {
             $goods['skuInfo']['goods_price'] = UserGradeService::getDiscountPrice($goods['skuInfo']['goods_price'], $discountRatio);
+            $goods['skuInfo']['holiday_price'] = UserGradeService::getDiscountPrice($goods['skuInfo']['holiday_price'], $discountRatio);
         }
     }
 }

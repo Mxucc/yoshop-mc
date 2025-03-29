@@ -75,6 +75,12 @@ class Spec extends BaseModel
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
+    /**
+     * 规格组写入数据库并生成id
+     * @param array $specList
+     * @param int|null $storeId
+     * @return array
+     */
     public static function getNewSpecList(array $specList, int $storeId = null): array
     {
         // 规格组名称合集
@@ -85,7 +91,8 @@ class Spec extends BaseModel
         foreach ($specList as $key => &$item) {
             $alreadyItem = helper::getArrayItemByColumn($alreadyData, 'spec_name', $item['spec_name']);
             if (!empty($alreadyItem)) {
-                // 规格名已存在的记录spec_id
+                // 规格名已存在则更新spec_type
+                static::update(['spec_type' => $item['spec_type']], ['spec_id' => $alreadyItem['spec_id']]);
                 $item['spec_id'] = $alreadyItem['spec_id'];
             } else {
                 // 规格名不存在的新增记录
@@ -124,6 +131,7 @@ class Spec extends BaseModel
     {
         return self::create([
             'spec_name' => $item['spec_name'],
+            'spec_type' => $item['spec_type'],
             'store_id' => $storeId ?: self::$storeId
         ]);
     }
